@@ -1,0 +1,25 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+  data_bags_path: 'test/fixtures/data_bags'
+  clients_path: 'test/fixtures/clients'
+
+platforms:
+  - name: ubuntu-12.04
+    driver_config:
+      box: chef/ubuntu-12.04
+  - name: centos-6.5
+    driver_config:
+      box: chef/centos-6.5
+
+suites:
+  - name: default
+    run_list:
+      - recipe[vault_test::default]
+    attributes:
+      vaults:
+        required:
+          - test_module
