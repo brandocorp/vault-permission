@@ -31,9 +31,15 @@ knife[:vault_admins] = ['validator']
 
 Once the validator has been made an admin, you can provide the new node with
 access, by using the `vault_permission` resource. As an example, suppose we need
-to give the node access to the `development` item in the `passwords` vault. with
-the validator as an admin of the vault, we then add the following in our recipe
-code.
+to give the node access to the `development` item in the `passwords` vault.
+First, create the vault if it doesn't already exist.
+
+```shell
+knife vault create secrets test '{"admin": "password"}' -A brandocorp-validator -m client
+```
+
+With the validator as an admin of the vault, we then add the following in our
+recipe code.
 
 #### Example:
 
@@ -43,8 +49,8 @@ vault_permission "Adding #{node.name} to vault[passwords::development]" do
   client_key  Chef::Config[:client_key]
   vault_name  'passwords'
   vault_item  'development'
-  admin_name  'chef-validator'
-  admin_key   '/etc/chef/validation.pem'
+  admin_name  'brandocorp-validator'
+  admin_key   '/etc/chef/brandocorp-validator.pem'
 end
 ```
 

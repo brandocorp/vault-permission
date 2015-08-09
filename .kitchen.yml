@@ -17,3 +17,6 @@ suites:
     run_list:
       - recipe[vault_test::default]
     attributes:
+      vault_permission:
+        admin_key: /tmp/kitchen/validation.pem
+        admin_name: test-kitchen

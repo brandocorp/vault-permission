@@ -9,8 +9,8 @@ vault_permission 'Add current node to vault permissions' do
   client_key Chef::Config[:client_key]
   vault_name 'secrets'
   vault_item 'test'
-  admin_name 'test-kitchen'
-  admin_key '/tmp/kitchen/validation.pem'
+  admin_name node['vault_permission']['admin_name']
+  admin_key  node['vault_permission']['admin_key']
 end
 
 vault = ChefVault::Item.load('secrets', 'test')
