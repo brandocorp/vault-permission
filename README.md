@@ -35,7 +35,7 @@ to give the node access to the `development` item in the `passwords` vault.
 First, create the vault if it doesn't already exist.
 
 ```shell
-knife vault create secrets test '{"admin": "password"}' -A brandocorp-validator -m client
+knife vault create passwords development '{"admin": "password"}' -A brandocorp-validator -m client
 ```
 
 With the validator as an admin of the vault, we then add the following in our
@@ -51,6 +51,7 @@ vault_permission "Adding #{node.name} to vault[passwords::development]" do
   vault_item  'development'
   admin_name  'brandocorp-validator'
   admin_key   '/etc/chef/brandocorp-validator.pem'
+  only_if { ::File.exist? '/etc/chef/brandocorp-validator.pem' }
 end
 ```
 
@@ -71,8 +72,8 @@ Start by creating some fixture data.
 ##### knife.rb
 
 ```shell
-$ mkdir -p test/fixtures/{.chef,clients,data_bags}
-$ cat > test/fixtures/.chef/knife.rb <<-EOS
+$ mkdir -p ./test/fixtures/{.chef,clients,data_bags}
+$ cat > ./test/fixtures/.chef/knife.rb <<-EOS
 node_name         'test-kitchen'
 client_key        'test-kitchen.pem'
 cookbook_path File.expand_path("../../cookbooks", __FILE__)
@@ -83,7 +84,7 @@ EOS
 ##### test-kitchen.pem
 
 ```shell
-$ cat > test/fixtures/.chef/test-kitchen.pem <<-EOS
+$ cat > ./test/fixtures/.chef/test-kitchen.pem <<-EOS
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA0sOY9tHvVtLZ6xmVmH8d8LrRrNcWOXbrvvCrai+T3GtRvRSL
 hksLrpOpD0L9EHM6NdThNF/eGA9Oq+UKAe6yXR0hwsKuxKXqQ8SEmlhZZ9GiuggD
@@ -117,7 +118,7 @@ EOS
 ##### test-kitchen.pub
 
 ```shell
-$ cat > test/fixtures/.chef/test-kitchen.pub <<-EOS
+$ cat > ./test/fixtures/.chef/test-kitchen.pub <<-EOS
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0sOY9tHvVtLZ6xmVmH8d
 8LrRrNcWOXbrvvCrai+T3GtRvRSLhksLrpOpD0L9EHM6NdThNF/eGA9Oq+UKAe6y
@@ -133,7 +134,7 @@ EOS
 ##### test-kitchen.json
 
 ```shell
-$ cat > test/fixtures/clients/test-kitchen.json <<-EOS
+$ cat > ./test/fixtures/clients/test-kitchen.json <<-EOS
 {
   "name": "test-kitchen",
   "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0sOY9tHvVtLZ6xmVmH8d\n8LrRrNcWOXbrvvCrai+T3GtRvRSLhksLrpOpD0L9EHM6NdThNF/eGA9Oq+UKAe6y\nXR0hwsKuxKXqQ8SEmlhZZ9GiuggDB/zYD3ItB6SGpdkRe7kQqTChQyrIXqbRkJqx\noTXLyeJDF0sCyTdp3L8IZCUWodM8oV9TlQBJHYtG1gLUwIi8kcMVEoCn2Q8ltCj0\n/ftnwhTtwO52RkWA0uYOLGVayHsLSCFfx+ACWPU/oWCwW5/KBqb3veTv0aEg/nh0\nQsFzRLoTx6SRFI5dT2Nf8iiJe4WCUG8WKEB2G8QPnxsxfOPYDBdTJ4CXEi2e+z41\nVQIDAQAB\n-----END PUBLIC KEY-----",
@@ -151,7 +152,7 @@ With the above files in place, and inside the `test/fixtures` directory, you
 should be able to run the following command.
 
 ```shell
-$ cd test/fixtures
+$ cd ./test/fixtures
 $ knife client list
 test-kitchen
 ```
@@ -162,7 +163,7 @@ Create the development vault item in the passwords vault.
 
 ```shell
 $ knife vault create passwords development '{"admin": "password"}' -A test-kitchen
-$ ls data_bags/passwords/
+$ ls ./data_bags/passwords/
 development.json      development_keys.json
 ```
 
@@ -185,11 +186,11 @@ vault_permission "Adding #{node.name} to vault[passwords::development]" do
   client_key  Chef::Config[:client_key]
   vault_name  'passwords'
   vault_item  'development'
-  admin_name  'chef-validator'
-  admin_key   '/etc/chef/validation.pem'
+  admin_name  'test-kitchen'
+  admin_key   '/tmp/kitchen/validator.pem'
 end
 
 # test our access
-vault = ChefVault::Item.load('passwords', 'test')
+vault = ChefVault::Item.load('passwords', 'development')
 log vault['admin']
 ```
