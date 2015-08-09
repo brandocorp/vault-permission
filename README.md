@@ -17,6 +17,9 @@ When bootstrapping a new node, some assumptions are made. The first assumption
 is that the node still has access to the validator pem. The second assumption is
 that the validator client has been made an administrator of all required vaults.
 
+> Note: The `Vagrantfile` included [here](https://github.com/brandocorp/vault-permission/blob/master/Vagrantfile) was used to validate functionality against an active Chef Server. 
+
+
 ### Setup
 
 One way to achieve this is by
