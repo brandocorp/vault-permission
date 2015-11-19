@@ -71,6 +71,7 @@ Procfile
 #############
 cookbooks/*
 tmp
+.chef
 
 # Cookbooks #
 #############

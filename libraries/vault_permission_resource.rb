@@ -1,82 +1,46 @@
 class Chef
   class Resource
-    class VaultPermission < Chef::Resource
-      provides :vault_permission, on_platforms: :all
+    class VaultPermission < Chef::Resource::LWRPBase
 
-      def initialize(name, run_context = nil)
-        super
-        @action = :add
-        @allowed_actions.push(:add, :remove)
-        @vault_name = name
-        @vault_item = nil
-        @admin_name = nil
-        @admin_key  = nil
-        @resource_name = :vault_permission
-        @provider = Chef::Provider::VaultPermission
-      end
+      identity_attr :client_name
 
-      def client_name(arg = nil)
-        set_or_return(
-          :client_name,
-          arg,
-          kind_of: [String],
-          default: Chef::Config[:node_name]
-        )
-      end
+      resource_name :vault_permission
 
-      def client_key(arg = nil)
-        set_or_return(
-          :client_key,
-          arg,
-          kind_of: [String],
-          default: Chef::Config[:client_key]
-        )
-      end
+      actions :add, :remove
+      default_action :add
 
-      def vault_name(arg = nil)
-        set_or_return(
-          :vault_name,
-          arg,
-          kind_of: [String],
-          required: true,
-          default: nil
-        )
-      end
+      attribute :client_name,
+        kind_of: String,
+        default: Chef::Config[:node_name]
 
-      def vault_item(arg = nil)
-        set_or_return(
-          :vault_item,
-          arg,
-          kind_of: [String],
-          required: true,
-          default: nil
-        )
-      end
+      attribute :client_key,
+        kind_of: String,
+        default: Chef::Config[:client_key]
 
-      def admin_name(arg = nil)
-        set_or_return(
-          :admin_client,
-          arg,
-          kind_of: [String],
-          default: nil
-        )
-      end
+      attribute :vault_name,
+        kind_of: String,
+        required: true,
+        default: nil
 
-      def admin_key(arg = nil)
-        set_or_return(
-          :admin_client_key,
-          arg,
-          kind_of: [String],
-          required: true,
-          default: nil
-        )
-      end
+      attribute :vault_item,
+        kind_of: String,
+        required: true,
+        default: nil
 
-      def after_created
-        Array(@action).each do |action|
-          run_action(action)
-        end
-      end
+      attribute :admin_name,
+        kind_of: String,
+        default: nil
+
+      attribute :admin_key,
+        kind_of: String,
+        required: true,
+        default: nil
+
+      # def after_created
+      #   Array(@action).each do |action|
+      #     run_action(action)
+      #   end
+      # end
     end
   end
 end
