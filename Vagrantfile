@@ -12,7 +12,7 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "chef/ubuntu-14.04"
+  config.vm.box = "bento/ubuntu-14.04"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -26,7 +26,7 @@ Vagrant.configure(2) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
+  config.vm.network "private_network", ip: "192.168.33.10"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -70,9 +70,11 @@ Vagrant.configure(2) do |config|
   # SHELL
 
   config.vm.provision "chef_client" do |chef|
+    chef.node_name = "vault-client.vagrant.up"
     chef.chef_server_url = "https://api.opscode.com/organizations/brandocorp"
     chef.validation_key_path = "#{ENV['HOME']}/.chef/brandocorp/brandocorp-validator.pem"
     chef.validation_client_name = 'brandocorp-validator'
+    chef.log_level = :info
     chef.run_list = [ 'recipe[vault_test::default]' ]
     chef.json = {
       vault_permission: {

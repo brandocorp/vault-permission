@@ -1,0 +1,9 @@
+{
+  "chef":{
+    "chef_server_url": "https://api.opscode.com/organizations/brandocorp",
+    "node_name": "brandocorp",
+    "client_key": "/Users/502432254/.chef/brandocorp/brandocorp.pem",
+    "validation_client_name": "brandocorp-validator",
+    "validation_client_key": "/Users/502432254/.chef/brandocorp/brandocorp-validator.pem"
+  }
+}

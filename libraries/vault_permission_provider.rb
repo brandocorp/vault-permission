@@ -33,7 +33,7 @@ class Chef
       end
 
       def client
-        @client ||= generate_client_object
+        generate_client_object
       end
 
       def generate_client_object
@@ -97,23 +97,45 @@ class Chef
 
       def as_vault_admin
         Chef::Log.debug "Assuming Admin Role: #{admin_name}"
-        Chef::Config[:node_name]  = admin_name
-        Chef::Config[:client_key] = admin_key
+        assume_admin_role
+        load_vault
         yield
         Chef::Log.debug "Assuming Client Role: #{client_name}"
+        assume_client_role
+      end
+
+      def assume_client_role
         Chef::Config[:node_name]  = client_name
         Chef::Config[:client_key] = client_key
       end
 
+      def assume_admin_role
+        Chef::Config[:node_name]  = admin_name
+        Chef::Config[:client_key] = admin_key
+      end
+
+      def load_vault
+        @vault = ChefVault::Item.load(vault_name, vault_item)
+      end
+
       def add_vault_permission
+        Chef::Log.debug "#{vault.raw_data}"
         vault.keys.add(client, vault.secret, 'clients')
+        Chef::Log.debug vault.raw_data
         vault.keys.save
+        # vault.clients(client, :add)
       end
 
       def remove_vault_permission
-        vault.keys.delete(client, 'clients')
+        Chef::Log.debug vault.to_json
+        vault.keys.delete(client_name, 'clients')
+        Chef::Log.debug vault.to_json
         vault.keys.save
+        # vault.clients(client, :remove)
       end
+
+      alias_method :action_add, :action_enable
+      alias_method :action_remove, :action_disable
     end
   end
 end

@@ -6,7 +6,7 @@ class Chef
 
       resource_name :vault_permission
 
-      actions :add, :remove
+      actions :add, :remove, :enable, :disable
       default_action :add
 
       attribute :client_name,
