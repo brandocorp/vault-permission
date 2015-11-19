@@ -17,7 +17,7 @@ When bootstrapping a new node, some assumptions are made. The first assumption
 is that the node still has access to the validator pem. The second assumption is
 that the validator client has been made an administrator of all required vaults.
 
-> Note: The `Vagrantfile` included [here](https://github.com/brandocorp/vault-permission/blob/master/Vagrantfile) was used to validate functionality against an active Chef Server. 
+> Note: The `Vagrantfile` included [here](https://github.com/brandocorp/vault-permission/blob/master/Vagrantfile) was used to validate functionality against an active Chef Server.
 
 
 ### Setup
@@ -183,6 +183,18 @@ id:    development
 You should then be able to access the Vault from your node using the `vault_permission` resource as described above.
 
 ```ruby
+# test our access before
+ruby_block 'before' do
+  block do
+    begin
+      vault = ChefVault::Item.load('passwords', 'development')
+      Chef::Log.info "admin = #{vault['admin']}"
+    rescue ChefVault::Exceptions::SecretDecryption
+      Chef::Log.warn "Vault can not be decrypted by this client, yet!"
+    end
+  end
+end
+
 # grant permissions
 vault_permission "Adding #{node.name} to vault[passwords::development]" do
   client_name Chef::Config[:node_name]
@@ -193,7 +205,15 @@ vault_permission "Adding #{node.name} to vault[passwords::development]" do
   admin_key   '/tmp/kitchen/validator.pem'
 end
 
-# test our access
-vault = ChefVault::Item.load('passwords', 'development')
-log vault['admin']
+# test our access after
+ruby_block 'after' do
+  block do
+    begin
+      vault = ChefVault::Item.load('passwords', 'development')
+      Chef::Log.info "admin = #{vault['admin']}"
+    rescue ChefVault::Exceptions::SecretDecryption
+      Chef::Log.warn "Vault can not be decrypted by this client, yet!"
+    end
+  end
+end
 ```
