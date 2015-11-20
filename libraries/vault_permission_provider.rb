@@ -133,9 +133,6 @@ class Chef
         vault.keys.save
         # vault.clients(client, :remove)
       end
-
-      alias_method :action_add, :action_enable
-      alias_method :action_remove, :action_disable
     end
   end
 end
